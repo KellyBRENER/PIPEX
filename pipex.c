@@ -6,7 +6,7 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/05 12:01:50 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/05 13:34:14 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,20 +31,30 @@ char	*ft_getpath(char *cmd, char **env)
 
 	i = 0;
 	bool = 0;
+	all_path = NULL;
+	path_cmd = NULL;
 	while (env[i] != NULL && bool == 0)
 	{
-		if (ft_strnstr(env[i], "PATH=", 5) != NULL)
+		if (ft_strnstr(env[i], "PATH=", 5) != NULL) //cherche PATH= dans env
 		{
-			all_path = ft_split(ft_substr(env[i], 5, strchr(env[i], "\n"), ":"));
+			all_path = ft_split(ft_substr(env[i], 5, strchr(env[i], "\n"), ":")); //extrait les chemin de env[i] apres PATH= jusqu'au "\n"
 			bool = 1;
 		}
 		i++;
 	}
-	while (all_path[i] && bool == 1)
+	i = 0;
+	while (all_path[i])
 	{
-		if (access)
+		path_cmd = ft_strjoin(all_path[i], cmd)
+		if (access(path_cmd, F_OK) == 0)
+		{
+			if(access(path_cmd, X_OK) == 0)
+				return (path_cmd, free(all_path));
+		}
+		free(path_cmd);
+		i++;
 	}
-	path_cmd = ft_split(env, "PATH=")
+	return (NULL, free(all_path));
 }
 
 //fonction qui recupere le vecteur pour chaque commande
@@ -53,29 +63,6 @@ char	*ft_getpath(char *cmd, char **env)
 //3. Tester chacun des chemin avec la commande grace a la fonction access
 //4. integrer le chemin trouve dans le vecteur[0]
 //5. integrer le reste des arguments dans le vecteur
-char	**ft_getvector(char *str, char **env)
-{
-	char	*cmd;
-	char	**ve_cmd;
-	char	*path_cmd;
-//soit strlcpy qui copie l-1 char de str (en ayant chercher la position de " " avec strchr en amont)
-//soit substr qui alloue de la memoire et copie str de start a len
-	ve_cmd = NULL;
-	path_cmd = NULL;
-	cmd = ft_substr(str, 0, ft_strchr(str, " "));
-	path_cmd = ft_getpath(cmd, env)
-
-	ve_cmd = ft_split(str);
-	if (!cmd) {
-		return NULL;
-	}
-	path = ft_getpath(cmd, env);
-	if (!path) {
-		return NULL;
-	free(cmd, path_cmd);
-	return (ve_cmd);
-	}
-}
 
 //fonction principale qui execute la cmd1 ds le processus enfant et la cmd2 dans le processus parent
 int	pipex(int argc, char **argv, char **env)
@@ -95,7 +82,10 @@ int	pipex(int argc, char **argv, char **env)
 	if (pid == 0)
 	{
 		//child process
-		int fd_infile;
+		int	fd_infile;
+		char	**ve_cmd;
+
+		ve_cmd = split(argv[2], " ");
 		fd_infile = open(argv[1], O_RDONLY);
 		if (fd_infile == -1) {
 			ft_printf("error opening infile");
@@ -106,26 +96,34 @@ int	pipex(int argc, char **argv, char **env)
 		close(fd[0]);
 		close(fd[1]);
 		close(fd_infile);
-		execve(ft_getvector(argv[i], env), env);
+		execve(ft_getpath(strjoin("/", ve_cmd[0]), env), ve_cmd, env);
 		ft_printf("error executing first command");
 		return -1;
 	}
 	//parent process
 	int	fd_outfile;
+	char	**ve_cmd;
+
+	ve_cmd = split(argv[3], " ");
 	fd_outfile = open(argv[4], O_WRONLY);
+	if (fd_outfile == -1)
+	{
+		ft_printf("error opening outfile");
+		return -1;
+	}
 	dup2(fd[0], STDIN_FILENO);
 	dup2(fd_outfile, STDOUT_FILENO);
 	close(fd[0]);
 	close(fd[1]);
 	close(fd_outfile);
-	execve(ft_getvector(argv[3], env), env);
+	execve(ft_getpath(strjoin("/", ve_cmd[0]), env), ve_cmd, env);
 	ft_printf("error executing second command");
 	return -1;
 }
 
 int	main(int argc, char **argv, char **env)
 {
-	if (argc < 5)
+	if (argc != 5)
 	{
 		return 4;
 	}
