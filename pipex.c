@@ -6,12 +6,24 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/08 11:21:58 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/08 11:52:10 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+void	ft_tabfree(char **tab)
+{
+	int	i;
 
+	i = 0;
+	if (tab) {
+		while (tab[i]) {
+			free(tab[i]);
+			i++;
+		}
+	}
+	free(tab);
+}
 //fonction qui recupere le chemin, le PATH, pour chaque commande et l'integre dans le vecteur
 char	*ft_getpath(char *cmd, char **env)
 {
@@ -34,21 +46,16 @@ char	*ft_getpath(char *cmd, char **env)
 		i++;
 	}
 	i = 0;
-	while (all_path[i])
-	{
+	while (all_path[i]) {
 		path_cmd = ft_strjoin(all_path[i], cmd);
-		if (access(path_cmd, F_OK) == 0)
-		{
-			if(access(path_cmd, X_OK) == 0)
-			{
-				free(all_path);
-				return (path_cmd);
-			}
+		if (access(path_cmd, F_OK | X_OK) == 0) {
+			ft_tabfree(all_path);
+			return (path_cmd);
 		}
 		free(path_cmd);
 		i++;
 	}
-	free(all_path);
+	ft_tabfree(all_path);
 	return (NULL);
 }
 
@@ -63,27 +70,23 @@ char	*ft_getpath(char *cmd, char **env)
 int	pipex(char **argv, char **env)
 {
 	int	fd[2];
-	if (pipe(fd) == -1)
-	{
-		ft_printf("error creating pipe");
+	if (pipe(fd) == -1) {
+		perror("error creating pipe");
 		return -1;
 	}
 	int	pid = fork();
-	if (pid == -1)
-	{
-		ft_printf("error creating fork");
+	if (pid == -1) {
+		perror("error creating fork");
 		return -1;
 	}
-	if (pid == 0)
-	{
-		//child process
+	if (pid == 0) {
 		int	fd_infile;
 		char	**ve_cmd;
 
 		ve_cmd = ft_split(argv[2], ' ');
 		fd_infile = open(argv[1], O_RDONLY);
 		if (fd_infile == -1) {
-			ft_printf("error opening infile");
+			perror("error opening infile");
 			return -1;
 		}
 		dup2(fd_infile, STDIN_FILENO);
@@ -92,18 +95,16 @@ int	pipex(char **argv, char **env)
 		close(fd[1]);
 		close(fd_infile);
 		execve(ft_getpath(ft_strjoin("/", ve_cmd[0]), env), ve_cmd, env);
-		ft_printf("error executing first command");
+		perror("error executing first command");
 		return -1;
 	}
-	//parent process
 	int	fd_outfile;
 	char	**ve_cmd;
 
 	ve_cmd = ft_split(argv[3], ' ');
 	fd_outfile = open(argv[4], O_WRONLY);
-	if (fd_outfile == -1)
-	{
-		ft_printf("error opening outfile");
+	if (fd_outfile == -1) {
+		perror("error opening outfile");
 		return -1;
 	}
 	dup2(fd[0], STDIN_FILENO);
@@ -112,19 +113,15 @@ int	pipex(char **argv, char **env)
 	close(fd[1]);
 	close(fd_outfile);
 	execve(ft_getpath(ft_strjoin("/", ve_cmd[0]), env), ve_cmd, env);
-	ft_printf("error executing second command");
+	perror("error executing second command");
 	return -1;
 }
 
 int	main(int argc, char **argv, char **env)
 {
 	if (argc != 5)
-	{
-		return 4;
-	}
+		return (1, write(1, "incorrect argument counts", 25));
 	if (pipex(argv, env) == -1)
-	{
-		return 3;
-	};
+		return (1, write(1, "pipex execution failed", 22));
 	return (0);
 }
