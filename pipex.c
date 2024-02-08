@@ -6,20 +6,11 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/05 13:34:14 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/05 16:15:59 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <errno.h>
-#include <fcntl.h>
+#include "pipex.h"
 
 //fonction qui recupere le chemin, le PATH, pour chaque commande et l'integre dans le vecteur
 char	*ft_getpath(char *cmd, char **env)
@@ -35,9 +26,9 @@ char	*ft_getpath(char *cmd, char **env)
 	path_cmd = NULL;
 	while (env[i] != NULL && bool == 0)
 	{
-		if (ft_strnstr(env[i], "PATH=", 5) != NULL) //cherche PATH= dans env
+		if (ft_strnstr(env[i], "PATH=", 5) != NULL)
 		{
-			all_path = ft_split(ft_substr(env[i], 5, strchr(env[i], "\n"), ":")); //extrait les chemin de env[i] apres PATH= jusqu'au "\n"
+			all_path = ft_split(ft_substr(env[i], 5, strchr(env[i], '\n')), ":"); //extrait les chemin de env[i] apres PATH= jusqu'au "\n"
 			bool = 1;
 		}
 		i++;
@@ -49,12 +40,16 @@ char	*ft_getpath(char *cmd, char **env)
 		if (access(path_cmd, F_OK) == 0)
 		{
 			if(access(path_cmd, X_OK) == 0)
-				return (path_cmd, free(all_path));
+			{
+				free(all_path);
+				return (path_cmd);
+			}
 		}
 		free(path_cmd);
 		i++;
 	}
-	return (NULL, free(all_path));
+	free(all_path);
+	return (NULL);
 }
 
 //fonction qui recupere le vecteur pour chaque commande
