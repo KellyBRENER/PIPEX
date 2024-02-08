@@ -6,7 +6,7 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/08 11:55:46 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/08 12:30:45 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,7 @@ int	pipex(char **argv, char **env)
 		close(fd[1]);
 		close(fd_infile);
 		execve(ft_getpath(ft_strjoin("/", ve_cmd[0]), env), ve_cmd, env);
+		printf("%s\n", ft_getpath(ft_strjoin("/", ve_cmd[0]), env));
 		perror("error executing first command");
 		return -1;
 	}

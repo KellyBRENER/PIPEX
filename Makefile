@@ -6,55 +6,43 @@
 #    By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/06 15:53:15 by kbrener-          #+#    #+#              #
-#    Updated: 2024/02/05 16:06:11 by kbrener-         ###   ########.fr        #
+#    Updated: 2024/02/08 12:14:50 by kbrener-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = pipex.a
+NAME = pipex
 
 CC = cc
 
-AR = ar
-
-ARFLAGS = rc
-
 CFLAGS = -Wall -Wextra -Werror
 
-LIBFT_PATH = ./libft/
-LIBFT_LIB = $(LIBFT_PATH)libft.a
+RM = rm -rf
+
+LIBFT = ./libft/libft.a
 
 SRC = pipex.c
 
-BONUS = pipex_bonus.c
-
 OBJ = $(SRC:.c=.o)
 
-INCLUDES = -I ./includes/\
-					-I ./libft/\
+all: $(NAME)
 
-BONUS_OBJ = $(BONUS:.c=.o)
+$(LIBFT):
+		@make -C ./libft
 
-all: $(LIBFT_LIB) $(NAME)
-
-$(NAME): $(OBJ)
-		$(AR) $(ARFLAGS) $(NAME) $(OBJ) $(LIBFT_LIB)
-		ranlib $(NAME)
+$(NAME): $(OBJ) $(LIBFT)
+		$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT)
 
 %.o: %.c
-	$(CC) -o $@ -c $< $(CFLAGS) $(INCLUDES)
-
-$(LIBFT_LIB):
-		@make -sC $(LIBFT_PATH)
+		$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-		rm -f $(OBJ) $(BONUS_OBJ) $(LIBFT_PATH)
+		@$(RM) -r $(OBJ)
+		@make clean -C ./libft
 
 fclean: clean
-		rm -f $(NAME) $(LIBFT_LIB)
+		@$(RM) $(NAME)
+		@$(RM) $(LIBFT)
 
 re: fclean all
-
-bonus: $(OBJ) $(BONUS_OBJ)
-	ar rcs $(NAME) $(OBJ) $(BONUS_OBJ)
 
 .PHONY: all clean fclean re bonus
