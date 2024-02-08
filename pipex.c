@@ -6,7 +6,7 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/08 11:52:10 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/08 11:55:46 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,9 +119,11 @@ int	pipex(char **argv, char **env)
 
 int	main(int argc, char **argv, char **env)
 {
-	if (argc != 5)
-		return (1, write(1, "incorrect argument counts", 25));
+	if (argc != 5) {
+		write(1, "incorrect argument count", 24);
+		return 1;
+	}
 	if (pipex(argv, env) == -1)
-		return (1, write(1, "pipex execution failed", 22));
+		return 1;
 	return (0);
 }
