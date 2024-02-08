@@ -6,7 +6,7 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/08 12:30:45 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/08 14:50:35 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ int	pipex(char **argv, char **env)
 	char	**ve_cmd;
 
 	ve_cmd = ft_split(argv[3], ' ');
-	fd_outfile = open(argv[4], O_WRONLY);
+	fd_outfile = open(argv[4], O_RDWR | O_CREAT | O_TRUNC, 0777);
 	if (fd_outfile == -1) {
 		perror("error opening outfile");
 		return -1;
