@@ -6,7 +6,7 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/08 14:50:35 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/13 10:24:31 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,35 +27,39 @@ void	ft_tabfree(char **tab)
 //fonction qui recupere le chemin, le PATH, pour chaque commande et l'integre dans le vecteur
 char	*ft_getpath(char *cmd, char **env)
 {
-	char	**all_path;
+	char	**tab_allpath;
 	char	*path_cmd;
+	char	*str_allpath;
 	int	bool;
 	int	i;
 
 	i = 0;
 	bool = 0;
-	all_path = NULL;
+	str_allpath = NULL;
+	tab_allpath = NULL;
 	path_cmd = NULL;
 	while (env[i] != NULL && bool == 0)
 	{
-		if (ft_strnstr(env[i], "PATH=", 5) != NULL)
+		if (ft_strnstr(env[i], "PATH=", 5) != NULL) //cherche path dans env
 		{
-			all_path = ft_split(ft_substr(env[i], 5, (size_t)strchr(env[i], '\0')), ':'); //extrait les chemin de env[i] apres PATH= jusqu'au "\n"
+			str_allpath = ft_substr(env[i], 5, (size_t)strchr(env[i], '\0'));
+			tab_allpath = ft_split(str_allpath, ':'); //extrait les chemin de env[i] apres PATH= jusqu'au "\n"
+			free(str_allpath);
 			bool = 1;
 		}
 		i++;
 	}
 	i = 0;
-	while (all_path[i]) {
-		path_cmd = ft_strjoin(all_path[i], cmd);
+	while (tab_allpath[i]) {
+		path_cmd = ft_strjoin(tab_allpath[i], cmd);
 		if (access(path_cmd, F_OK | X_OK) == 0) {
-			ft_tabfree(all_path);
+			ft_tabfree(tab_allpath);
 			return (path_cmd);
 		}
 		free(path_cmd);
 		i++;
 	}
-	ft_tabfree(all_path);
+	ft_tabfree(tab_allpath);
 	return (NULL);
 }
 
@@ -71,22 +75,23 @@ int	pipex(char **argv, char **env)
 {
 	int	fd[2];
 	if (pipe(fd) == -1) {
-		perror("error creating pipe");
+		perror("zsh");
 		return -1;
 	}
 	int	pid = fork();
 	if (pid == -1) {
-		perror("error creating fork");
+		perror("zsh");
 		return -1;
 	}
 	if (pid == 0) {
 		int	fd_infile;
 		char	**ve_cmd;
+		char	*cmd_path;
 
 		ve_cmd = ft_split(argv[2], ' ');
 		fd_infile = open(argv[1], O_RDONLY);
 		if (fd_infile == -1) {
-			perror("error opening infile");
+			perror("zsh");
 			return -1;
 		}
 		dup2(fd_infile, STDIN_FILENO);
@@ -94,18 +99,21 @@ int	pipex(char **argv, char **env)
 		close(fd[0]);
 		close(fd[1]);
 		close(fd_infile);
-		execve(ft_getpath(ft_strjoin("/", ve_cmd[0]), env), ve_cmd, env);
-		printf("%s\n", ft_getpath(ft_strjoin("/", ve_cmd[0]), env));
-		perror("error executing first command");
+		cmd_path = ft_getpath(ft_strjoin("/", ve_cmd[0]), env);
+		execve(cmd_path, ve_cmd, env);
+		free(cmd_path);
+		ft_tabfree(ve_cmd);
+		perror("zsh");
 		return -1;
 	}
 	int	fd_outfile;
 	char	**ve_cmd;
+	char	*cmd_path;
 
 	ve_cmd = ft_split(argv[3], ' ');
 	fd_outfile = open(argv[4], O_RDWR | O_CREAT | O_TRUNC, 0777);
 	if (fd_outfile == -1) {
-		perror("error opening outfile");
+		perror("zsh");
 		return -1;
 	}
 	dup2(fd[0], STDIN_FILENO);
@@ -113,8 +121,11 @@ int	pipex(char **argv, char **env)
 	close(fd[0]);
 	close(fd[1]);
 	close(fd_outfile);
-	execve(ft_getpath(ft_strjoin("/", ve_cmd[0]), env), ve_cmd, env);
-	perror("error executing second command");
+	cmd_path = ft_getpath(ft_strjoin("/", ve_cmd[0]), env);
+	execve(cmd_path, ve_cmd, env);
+	free(cmd_path);
+	ft_tabfree(ve_cmd);
+	perror("zsh");
 	return -1;
 }
 
