@@ -6,7 +6,7 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/13 11:58:46 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/13 12:24:29 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,10 @@ int pipex(char **argv, char **env)
 		fd_infile = open(argv[1], O_RDONLY);
 		if (fd_infile == -1)
 		{
-			perror("zsh");
+			//perror("zsh");
+			ft_putstr_fd(strerror(errno), 1);
+			write(1, ": ", 2);
+			ft_putstr_fd(argv[1], 1);
 			return -1;
 		}
 		ve_cmd = ft_split(argv[2], ' ');
@@ -126,6 +129,8 @@ int pipex(char **argv, char **env)
 	if (fd_outfile == -1)
 	{
 		perror("zsh");
+		write(1, ": ", 2);
+		ft_putstr_fd(argv[4], 1);
 		return -1;
 	}
 	ve_cmd = ft_split(argv[3], ' ');

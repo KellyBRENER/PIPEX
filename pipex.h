@@ -6,7 +6,7 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 16:07:06 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/08 11:22:13 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/13 14:32:36 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@
 #include <errno.h>
 #include <fcntl.h>
 
-char			*ft_getpath(char *cmd, char **env);
+char			*ft_getpath(char *cmd, char *str_allpath);
+void			ft_tabfree(char **tab);
+char			*ft_getenv(char *str, char **env);
 int				pipex(char **argv, char **env);
 
 #endif
