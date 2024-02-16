@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
+/*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/13 12:24:29 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/16 11:37:02 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,14 +75,67 @@ char *ft_getpath(char *cmd, char **env)
 // 5. integrer le reste des arguments dans le vecteur
 
 // fonction principale qui execute la cmd1 ds le processus enfant et la cmd2 dans le processus parent
-int pipex(char **argv, char **env)
+int pipex(int arg_nbr, char **argv, char **env)
 {
-	int fd[2];
-	if (pipe(fd) == -1)
+	int fd[2][2];//fd[0][0]=infile, fd[0][1]=outfile, fd[1] = pipe
+	if (pipe(fd[1]) == -1)
 	{
-		perror("zsh");
+		perror("error creating pipe");
 		return -1;
 	}
+	fd[0][0] = open(argv[1], O_RDONLY);
+	if (fd[0][0] == -1)
+	{
+		perror("error opening infile");
+		return -1;
+	}
+	fd[0][1] = open(argv[arg_nbr], O_RDWR | O_CREAT | O_TRUNC, 0777);
+	if (fd[0][1] == -1)
+	{
+		perror("error opening outfile");
+		return -1;
+	}
+	while (i < arg_nbr)
+	{
+		ft_fork(fd, argv, env, i);
+	}
+}
+
+//cree les forks et attribue l'entree et la sortie de chaque commande
+void	ft_fork(int **fd, char **argv, char **env, int i)
+{
+	int	pid;
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("error creating fork");
+		return;
+	}
+	if (pid == 0) //child process
+	{
+		if (i = 0) //firts cmd
+		{
+			dup2(fd[0][0], STDIN_FILENO);
+			dup2(fd[1][1], STDOUT_FILENO);
+		}
+		else if (i < arg_nbr)
+		{
+			dup2(fd[1][0], STDIN_FILENO);
+			dup2(fd[1][1], STDOUT_FILENO);
+		}
+		else
+		{
+			dup2(fd[1][0], STDIN_FILENO);
+			dup2(fd[0][1], STDOUT_FILENO);
+		}
+		ft_exec(i, argv, env); //execute les commandes
+	}
+	wait
+}
+//doit on verifier que le dernier argument est un nom de fichier et non une commande ?
+
+
+	/*
 	int pid = fork();
 	if (pid == -1)
 	{
@@ -96,15 +149,6 @@ int pipex(char **argv, char **env)
 		char *cmd_path;
 		char *cmd;
 
-		fd_infile = open(argv[1], O_RDONLY);
-		if (fd_infile == -1)
-		{
-			//perror("zsh");
-			ft_putstr_fd(strerror(errno), 1);
-			write(1, ": ", 2);
-			ft_putstr_fd(argv[1], 1);
-			return -1;
-		}
 		ve_cmd = ft_split(argv[2], ' ');
 		cmd = ft_strjoin("/", ve_cmd[0]);
 		dup2(fd_infile, STDIN_FILENO);
@@ -120,19 +164,10 @@ int pipex(char **argv, char **env)
 		perror("zsh");
 		return -1;
 	}
-	int fd_outfile;
 	char **ve_cmd;
 	char *cmd_path;
 	char *cmd;
 
-	fd_outfile = open(argv[4], O_RDWR | O_CREAT | O_TRUNC, 0777);
-	if (fd_outfile == -1)
-	{
-		perror("zsh");
-		write(1, ": ", 2);
-		ft_putstr_fd(argv[4], 1);
-		return -1;
-	}
 	ve_cmd = ft_split(argv[3], ' ');
 	cmd = ft_strjoin("/", ve_cmd[0]);
 	dup2(fd[0], STDIN_FILENO);
@@ -146,6 +181,7 @@ int pipex(char **argv, char **env)
 	free(cmd);
 	ft_tabfree(ve_cmd);
 	perror("zsh");
+	*/
 	return -1;
 }
 
