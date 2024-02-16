@@ -6,7 +6,7 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/16 11:37:02 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/16 17:14:56 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,12 +77,12 @@ char *ft_getpath(char *cmd, char **env)
 }
 
 //ft_exec execute la commande
-void	ft_exec(int i, char **argv, char **env)
+void	ft_exec(int i, char **argv, char **env, int **fd)
 {
 	char **ve_cmd;
 	char *cmd_path;
 	char *cmd;
-	
+
 	ve_cmd = ft_split(argv[i], ' ');
 	cmd = ft_strjoin("/", ve_cmd[0]);
 	close(fd[0][0]);
@@ -96,7 +96,7 @@ void	ft_exec(int i, char **argv, char **env)
 	ft_tabfree(ve_cmd);
 	//changer printf en ft_printf et donc integrer ft_printf dans la libft
     printf("Erreur lors de l'execution de la commande : %s\n%s", ve_cmd[0], strerror(errno));
-	return -1;
+	return;
 }
 
 //cree les forks et attribue l'entree et la sortie de chaque commande
@@ -114,7 +114,7 @@ void	ft_fork_and_dup(int **fd, char **argv, char **env, int arg_nbr)
 	}
 	if (pid == 0) //child process
 	{
-		if (i = 2) //firts cmd
+		if (i == 2) //firts cmd
 		{
 			dup2(fd[0][0], STDIN_FILENO);
 			dup2(fd[1][1], STDOUT_FILENO);
@@ -124,7 +124,7 @@ void	ft_fork_and_dup(int **fd, char **argv, char **env, int arg_nbr)
 			dup2(fd[1][0], STDIN_FILENO);
 			dup2(fd[1][1], STDOUT_FILENO);
 		}
-		ft_exec(i, argv, env); //execute les commandes
+		ft_exec(i, argv, env, fd); //execute les commandes
 	}
 	wait(NULL);
 	i++;
@@ -132,14 +132,14 @@ void	ft_fork_and_dup(int **fd, char **argv, char **env, int arg_nbr)
 		ft_fork_and_dup(fd, argv, env, i);
 	dup2(fd[1][0], STDIN_FILENO);
 	dup2(fd[0][1], STDOUT_FILENO);
-	ft_exec(i, argv, env);
+	ft_exec(i, argv, env, fd);
 }
 
 // fonction principale qui cree les fd pour les envoyer dans fork
 int pipex_bonus(int arg_nbr, char **argv, char **env)
 {
 	int fd[2][2];//fd[0][0]=infile, fd[0][1]=outfile, fd[1] = pipe
-	
+
 	if (pipe(fd[1]) == -1)
 	{
 		perror("error creating pipe");
