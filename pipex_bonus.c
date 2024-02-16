@@ -77,7 +77,7 @@ char *ft_getpath(char *cmd, char **env)
 }
 
 //ft_exec execute la commande
-void	ft_exec(int i, argv, env)
+void	ft_exec(int i, char **argv, char **env)
 {
 	char **ve_cmd;
 	char *cmd_path;
@@ -126,7 +126,7 @@ void	ft_fork_and_dup(int **fd, char **argv, char **env, int arg_nbr)
 		}
 		ft_exec(i, argv, env); //execute les commandes
 	}
-	wait();
+	wait(NULL);
 	i++;
 	if (i < arg_nbr - 2)
 		ft_fork_and_dup(fd, argv, env, i);
@@ -136,7 +136,7 @@ void	ft_fork_and_dup(int **fd, char **argv, char **env, int arg_nbr)
 }
 
 // fonction principale qui cree les fd pour les envoyer dans fork
-int pipex(int arg_nbr, char **argv, char **env)
+int pipex_bonus(int arg_nbr, char **argv, char **env)
 {
 	int fd[2][2];//fd[0][0]=infile, fd[0][1]=outfile, fd[1] = pipe
 	
@@ -158,6 +158,7 @@ int pipex(int arg_nbr, char **argv, char **env)
 		return -1;
 	}
 	ft_fork_and_dup(fd, argv, env, arg_nbr);
+	return 0;
 }
 
 //doit on verifier que le dernier argument est un nom de fichier et non une commande ?
@@ -168,7 +169,8 @@ int main(int argc, char **argv, char **env)
 		write(1, "incorrect argument count", 24);
 		return 1;
 	}
-	if (pipex(argc, argv, env) == -1)
+	if (pipex_bonus(argc, argv, env) == -1)
 		return 1;
 	return (0);
 }
+//pour tester le bonus : < infile grep cat "wc -l" > outfile

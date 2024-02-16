@@ -25,9 +25,12 @@
 #include <errno.h>
 #include <fcntl.h>
 
-char			*ft_getpath(char *cmd, char *str_allpath);
+char			*ft_getpath(char *cmd, char **env);
 void			ft_tabfree(char **tab);
 char			*ft_getenv(char *str, char **env);
 int				pipex(char **argv, char **env);
+void            ft_exec(int i, char **argv, char **env);
+void            ft_fork_and_dup(int **fd, char **argv, char **env, int arg_nbr);
+int             pipex_bonus(int arg_nbr, char **argv, char **env);
 
 #endif
