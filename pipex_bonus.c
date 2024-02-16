@@ -11,6 +11,14 @@
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+// fonction qui recupere le vecteur pour chaque commande
+// 1. recuperer la commande
+// 2. recuperer ce qu'il y a entre "PATH=" et "\n" (l'ensemble des PATH)
+// 3. Tester chacun des chemin avec la commande grace a la fonction access
+// 4. integrer le chemin trouve dans le vecteur[0]
+// 5. integrer le reste des arguments dans le vecteur
+
 void ft_tabfree(char **tab)
 {
 	int i;
@@ -26,6 +34,7 @@ void ft_tabfree(char **tab)
 	}
 	free(tab);
 }
+
 // fonction qui recupere le chemin, le PATH, pour chaque commande et l'integre dans le vecteur
 char *ft_getpath(char *cmd, char **env)
 {
@@ -67,17 +76,70 @@ char *ft_getpath(char *cmd, char **env)
 	return (NULL);
 }
 
-// fonction qui recupere le vecteur pour chaque commande
-// 1. recuperer la commande
-// 2. recuperer ce qu'il y a entre "PATH=" et "\n" (l'ensemble des PATH)
-// 3. Tester chacun des chemin avec la commande grace a la fonction access
-// 4. integrer le chemin trouve dans le vecteur[0]
-// 5. integrer le reste des arguments dans le vecteur
+//ft_exec execute la commande
+void	ft_exec(int i, argv, env)
+{
+	char **ve_cmd;
+	char *cmd_path;
+	char *cmd;
+	
+	ve_cmd = ft_split(argv[i], ' ');
+	cmd = ft_strjoin("/", ve_cmd[0]);
+	close(fd[0][0]);
+	close(fd[0][1]);
+	close(fd[1][0]);
+	close(fd[1][1]);
+	cmd_path = ft_getpath(cmd, env);
+	execve(cmd_path, ve_cmd, env);
+	free(cmd_path);
+	free(cmd);
+	ft_tabfree(ve_cmd);
+	//changer printf en ft_printf et donc integrer ft_printf dans la libft
+    printf("Erreur lors de l'execution de la commande : %s\n%s", ve_cmd[0], strerror(errno));
+	return -1;
+}
 
-// fonction principale qui execute la cmd1 ds le processus enfant et la cmd2 dans le processus parent
+//cree les forks et attribue l'entree et la sortie de chaque commande
+void	ft_fork_and_dup(int **fd, char **argv, char **env, int arg_nbr)
+{
+	int	pid;
+	int	i;
+
+	i = 2;
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("error creating fork");
+		return;
+	}
+	if (pid == 0) //child process
+	{
+		if (i = 2) //firts cmd
+		{
+			dup2(fd[0][0], STDIN_FILENO);
+			dup2(fd[1][1], STDOUT_FILENO);
+		}
+		else
+		{
+			dup2(fd[1][0], STDIN_FILENO);
+			dup2(fd[1][1], STDOUT_FILENO);
+		}
+		ft_exec(i, argv, env); //execute les commandes
+	}
+	wait();
+	i++;
+	if (i < arg_nbr - 2)
+		ft_fork_and_dup(fd, argv, env, i);
+	dup2(fd[1][0], STDIN_FILENO);
+	dup2(fd[0][1], STDOUT_FILENO);
+	ft_exec(i, argv, env);
+}
+
+// fonction principale qui cree les fd pour les envoyer dans fork
 int pipex(int arg_nbr, char **argv, char **env)
 {
 	int fd[2][2];//fd[0][0]=infile, fd[0][1]=outfile, fd[1] = pipe
+	
 	if (pipe(fd[1]) == -1)
 	{
 		perror("error creating pipe");
@@ -95,104 +157,18 @@ int pipex(int arg_nbr, char **argv, char **env)
 		perror("error opening outfile");
 		return -1;
 	}
-	while (i < arg_nbr)
-	{
-		ft_fork(fd, argv, env, i);
-	}
+	ft_fork_and_dup(fd, argv, env, arg_nbr);
 }
 
-//cree les forks et attribue l'entree et la sortie de chaque commande
-void	ft_fork(int **fd, char **argv, char **env, int i)
-{
-	int	pid;
-	pid = fork();
-	if (pid == -1)
-	{
-		perror("error creating fork");
-		return;
-	}
-	if (pid == 0) //child process
-	{
-		if (i = 0) //firts cmd
-		{
-			dup2(fd[0][0], STDIN_FILENO);
-			dup2(fd[1][1], STDOUT_FILENO);
-		}
-		else if (i < arg_nbr)
-		{
-			dup2(fd[1][0], STDIN_FILENO);
-			dup2(fd[1][1], STDOUT_FILENO);
-		}
-		else
-		{
-			dup2(fd[1][0], STDIN_FILENO);
-			dup2(fd[0][1], STDOUT_FILENO);
-		}
-		ft_exec(i, argv, env); //execute les commandes
-	}
-	wait
-}
 //doit on verifier que le dernier argument est un nom de fichier et non une commande ?
-
-
-	/*
-	int pid = fork();
-	if (pid == -1)
-	{
-		perror("zsh");
-		return -1;
-	}
-	if (pid == 0)
-	{
-		int fd_infile;
-		char **ve_cmd;
-		char *cmd_path;
-		char *cmd;
-
-		ve_cmd = ft_split(argv[2], ' ');
-		cmd = ft_strjoin("/", ve_cmd[0]);
-		dup2(fd_infile, STDIN_FILENO);
-		dup2(fd[1], STDOUT_FILENO);
-		close(fd[0]);
-		close(fd[1]);
-		close(fd_infile);
-		cmd_path = ft_getpath(cmd, env);
-		execve(cmd_path, ve_cmd, env);
-		free(cmd_path);
-		free(cmd);
-		ft_tabfree(ve_cmd);
-		perror("zsh");
-		return -1;
-	}
-	char **ve_cmd;
-	char *cmd_path;
-	char *cmd;
-
-	ve_cmd = ft_split(argv[3], ' ');
-	cmd = ft_strjoin("/", ve_cmd[0]);
-	dup2(fd[0], STDIN_FILENO);
-	dup2(fd_outfile, STDOUT_FILENO);
-	close(fd[0]);
-	close(fd[1]);
-	close(fd_outfile);
-	cmd_path = ft_getpath(cmd, env);
-	execve(cmd_path, ve_cmd, env);
-	free(cmd_path);
-	free(cmd);
-	ft_tabfree(ve_cmd);
-	perror("zsh");
-	*/
-	return -1;
-}
-
 int main(int argc, char **argv, char **env)
 {
-	if (argc != 5)
+	if (argc < 5)
 	{
 		write(1, "incorrect argument count", 24);
 		return 1;
 	}
-	if (pipex(argv, env) == -1)
+	if (pipex(argc, argv, env) == -1)
 		return 1;
 	return (0);
 }
