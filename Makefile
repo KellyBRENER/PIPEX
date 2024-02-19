@@ -49,7 +49,7 @@ fclean: clean
 
 re: fclean all
 
-bonus: $(OBJ) $(BONUS_OBJ)
+bonus: $(OBJ) $(BONUS_OBJ) $(LIBFT)
 		$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(BONUS_OBJ) $(LIBFT)
 
 .PHONY: all clean fclean re bonus

@@ -149,7 +149,7 @@ int pipex(char **argv, char **env)
 	return -1;
 }
 
-int main(int argc, char **argv, char **env)
+/*int main(int argc, char **argv, char **env)
 {
 	if (argc != 5)
 	{
@@ -159,4 +159,4 @@ int main(int argc, char **argv, char **env)
 	if (pipex(argv, env) == -1)
 		return 1;
 	return (0);
-}
+}*/

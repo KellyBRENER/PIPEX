@@ -19,65 +19,8 @@
 // 4. integrer le chemin trouve dans le vecteur[0]
 // 5. integrer le reste des arguments dans le vecteur
 
-void ft_tabfree(char **tab)
-{
-	int i;
-
-	i = 0;
-	if (tab)
-	{
-		while (tab[i])
-		{
-			free(tab[i]);
-			i++;
-		}
-	}
-	free(tab);
-}
-
-// fonction qui recupere le chemin, le PATH, pour chaque commande et l'integre dans le vecteur
-char *ft_getpath(char *cmd, char **env)
-{
-	char **tab_allpath;
-	char *path_cmd;
-	char *str_allpath;
-	int bool;
-	int i;
-
-	i = 0;
-	bool = 0;
-	str_allpath = NULL;
-	tab_allpath = NULL;
-	path_cmd = NULL;
-	while (env[i] != NULL && bool == 0)
-	{
-		if (ft_strnstr(env[i], "PATH=", 5) != NULL) // cherche path dans env
-		{
-			str_allpath = ft_substr(env[i], 5, (size_t)strchr(env[i], '\0'));
-			tab_allpath = ft_split(str_allpath, ':'); // extrait les chemin de env[i] apres PATH= jusqu'au "\n"
-			free(str_allpath);
-			bool = 1;
-		}
-		i++;
-	}
-	i = 0;
-	while (tab_allpath[i])
-	{
-		path_cmd = ft_strjoin(tab_allpath[i], cmd);
-		if (access(path_cmd, F_OK | X_OK) == 0)
-		{
-			ft_tabfree(tab_allpath);
-			return (path_cmd);
-		}
-		free(path_cmd);
-		i++;
-	}
-	ft_tabfree(tab_allpath);
-	return (NULL);
-}
-
 //ft_exec execute la commande
-void	ft_exec(int i, char **argv, char **env, int **fd)
+void	ft_exec(int i, char **argv, char **env, int fd[2][2])
 {
 	char **ve_cmd;
 	char *cmd_path;
@@ -100,12 +43,10 @@ void	ft_exec(int i, char **argv, char **env, int **fd)
 }
 
 //cree les forks et attribue l'entree et la sortie de chaque commande
-void	ft_fork_and_dup(int **fd, char **argv, char **env, int arg_nbr)
+void	ft_fork_and_dup(int fd[2][2], char **argv, char **env, int arg_nbr, int i)
 {
 	int	pid;
-	int	i;
 
-	i = 2;
 	pid = fork();
 	if (pid == -1)
 	{
@@ -129,7 +70,7 @@ void	ft_fork_and_dup(int **fd, char **argv, char **env, int arg_nbr)
 	wait(NULL);
 	i++;
 	if (i < arg_nbr - 2)
-		ft_fork_and_dup(fd, argv, env, i);
+		ft_fork_and_dup(fd, argv, env, arg_nbr, i);
 	dup2(fd[1][0], STDIN_FILENO);
 	dup2(fd[0][1], STDOUT_FILENO);
 	ft_exec(i, argv, env, fd);
@@ -151,13 +92,13 @@ int pipex_bonus(int arg_nbr, char **argv, char **env)
 		perror("error opening infile");
 		return -1;
 	}
-	fd[0][1] = open(argv[arg_nbr], O_RDWR | O_CREAT | O_TRUNC, 0777);
+	fd[0][1] = open(argv[arg_nbr - 1], O_RDWR | O_CREAT | O_TRUNC, 0777);
 	if (fd[0][1] == -1)
 	{
 		perror("error opening outfile");
 		return -1;
 	}
-	ft_fork_and_dup(fd, argv, env, arg_nbr);
+	ft_fork_and_dup(fd, argv, env, arg_nbr, 2);
 	return 0;
 }
 
