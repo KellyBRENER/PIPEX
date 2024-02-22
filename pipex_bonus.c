@@ -20,86 +20,93 @@
 // 5. integrer le reste des arguments dans le vecteur
 
 //ft_exec execute la commande
-void	ft_exec(int i, char **argv, char **env, int fd[2][2])
+int	ft_exec(char *argv, char **env)
 {
 	char **ve_cmd;
 	char *cmd_path;
 	char *cmd;
 
-	ve_cmd = ft_split(argv[i], ' ');
+	ve_cmd = ft_split(argv, ' ');
 	cmd = ft_strjoin("/", ve_cmd[0]);
-	close(fd[0][0]);
-	close(fd[0][1]);
-	close(fd[1][0]);
-	close(fd[1][1]);
 	cmd_path = ft_getpath(cmd, env);
 	execve(cmd_path, ve_cmd, env);
 	free(cmd_path);
 	free(cmd);
 	ft_tabfree(ve_cmd);
 	//changer printf en ft_printf et donc integrer ft_printf dans la libft
-    printf("Erreur lors de l'execution de la commande : %s\n%s", ve_cmd[0], strerror(errno));
-	return;
+    perror("error command cannot be found or no executable");
+	return -1;
 }
 
 //cree les forks et attribue l'entree et la sortie de chaque commande
-void	ft_fork_and_dup(int fd[2][2], char **argv, char **env, int arg_nbr, int i)
+int	ft_fork_and_dup(char *cmd, char **env)
 {
 	int	pid;
+	int	fd[2];
 
+	if (pipe(fd) == -1)
+	{
+		perror("error creating pipe");
+		return -1;
+	}
 	pid = fork();
 	if (pid == -1)
 	{
 		perror("error creating fork");
-		return;
+		return -1;
 	}
 	if (pid == 0) //child process
 	{
-		if (i == 2) //firts cmd
+		dup2(fd[1], STDOUT_FILENO);
+		close(fd[0]);
+		close(fd[1]);
+		if (ft_exec(cmd, env) == -1)
 		{
-			dup2(fd[0][0], STDIN_FILENO);
-			dup2(fd[1][1], STDOUT_FILENO);
+			printf("execution of the command failed");
+			return -1;
 		}
-		else
-		{
-			dup2(fd[1][0], STDIN_FILENO);
-			dup2(fd[1][1], STDOUT_FILENO);
-		}
-		ft_exec(i, argv, env, fd); //execute les commandes
 	}
-	wait(NULL);
-	i++;
-	if (i < arg_nbr - 2)
-		ft_fork_and_dup(fd, argv, env, arg_nbr, i);
-	dup2(fd[1][0], STDIN_FILENO);
-	dup2(fd[0][1], STDOUT_FILENO);
-	ft_exec(i, argv, env, fd);
+	close(fd[1]);
+	dup2(fd[0], STDIN_FILENO);
+	close(fd[0]);
+	return 0;
 }
 
 // fonction principale qui cree les fd pour les envoyer dans fork
 int pipex_bonus(int arg_nbr, char **argv, char **env)
 {
-	int fd[2][2];//fd[0][0]=infile, fd[0][1]=outfile, fd[1] = pipe
+	int fd_in;
+	int	fd_out;
+	int	i;
 
-	if (pipe(fd[1]) == -1)
-	{
-		perror("error creating pipe");
-		return -1;
-	}
-	fd[0][0] = open(argv[1], O_RDONLY);
-	if (fd[0][0] == -1)
+	i = 2;
+	fd_in = open(argv[1], O_RDONLY);
+	if (fd_in == -1)
 	{
 		perror("error opening infile");
 		return -1;
 	}
-	fd[0][1] = open(argv[arg_nbr - 1], O_RDWR | O_CREAT | O_TRUNC, 0777);
-	if (fd[0][1] == -1)
+	dup2(fd_in, STDIN_FILENO);
+	close(fd_in);
+	while (i < arg_nbr - 2)
+	{
+		if (ft_fork_and_dup(argv[i], env) == -1)
+		{
+			printf("the commande %s cannot be exec", argv[i]);
+			return -1;
+		}
+		i++;
+	}
+	fd_out = open(argv[arg_nbr - 1], O_RDWR | O_CREAT | O_TRUNC, 0777);
+	if (fd_out == -1)
 	{
 		perror("error opening outfile");
 		return -1;
 	}
-	ft_fork_and_dup(fd, argv, env, arg_nbr, 2);
-	return 0;
+	dup2(fd_out, STDOUT_FILENO);
+	close(fd_out);
+	ft_exec(argv[i], env);
+	return -1;
 }
 
 //doit on verifier que le dernier argument est un nom de fichier et non une commande ?

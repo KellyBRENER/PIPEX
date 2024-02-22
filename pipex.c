@@ -11,6 +11,11 @@
 /* ************************************************************************** */
 
 #include "pipex.h"
+int	ft_heredoc(char **argv)
+{
+	dup2(STDOUT_FILENO, STDIN_FILENO);
+	
+}
 void ft_tabfree(char **tab)
 {
 	int i;
@@ -63,6 +68,7 @@ char *ft_getpath(char *cmd, char **env)
 		free(path_cmd);
 		i++;
 	}
+	perror("error command not found or not executable");
 	ft_tabfree(tab_allpath);
 	return (NULL);
 }
