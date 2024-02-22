@@ -12,12 +12,6 @@
 
 #include "pipex.h"
 
-// fonction qui recupere le vecteur pour chaque commande
-// 1. recuperer la commande
-// 2. recuperer ce qu'il y a entre "PATH=" et "\n" (l'ensemble des PATH)
-// 3. Tester chacun des chemin avec la commande grace a la fonction access
-// 4. integrer le chemin trouve dans le vecteur[0]
-// 5. integrer le reste des arguments dans le vecteur
 
 //ft_exec execute la commande
 int	ft_exec(char *argv, char **env)
@@ -78,7 +72,7 @@ int pipex_bonus(int arg_nbr, char **argv, char **env)
 	int fd_in;
 	int	fd_out;
 	int	i;
-
+//créer une fonction qui ouvre le infile et dup l'entrée standard
 	i = 2;
 	fd_in = open(argv[1], O_RDONLY);
 	if (fd_in == -1)
@@ -88,6 +82,7 @@ int pipex_bonus(int arg_nbr, char **argv, char **env)
 	}
 	dup2(fd_in, STDIN_FILENO);
 	close(fd_in);
+//créer une fonction qui boucle jusqu'à la derniere commande
 	while (i < arg_nbr - 2)
 	{
 		if (ft_fork_and_dup(argv[i], env) == -1)
@@ -97,6 +92,7 @@ int pipex_bonus(int arg_nbr, char **argv, char **env)
 		}
 		i++;
 	}
+//créer une fonction qui effectue la derniere commande et l'envoie dans le outfile
 	fd_out = open(argv[arg_nbr - 1], O_RDWR | O_CREAT | O_TRUNC, 0777);
 	if (fd_out == -1)
 	{
@@ -109,6 +105,36 @@ int pipex_bonus(int arg_nbr, char **argv, char **env)
 	return -1;
 }
 
+int	ft_here_doc(int argc, char **argv, char **env)
+{
+	char *line;
+	int	fd_heredoc;
+
+	fd_heredoc = open("here_doc", O_RDWR | O_CREAT | O_TRUNC, 0777);
+	while (1)
+	{
+		write(1, "pipe heredoc>", 13);
+		line = get_next_line(0);
+		if (line == NULL)
+		{
+			close(fd_heredoc);
+			free(line);
+			return -1;
+		}
+		if (ft_strlen(line) == ft_strlen(argv[2]) && ft_strncmp(line, argv[2], ft_strlen(argv[2])) == 0)
+		{
+			free(line);
+			break;
+		}
+		ft_putstr_fd(line, fd_heredoc);
+		free(line);
+	}
+	close(fd_heredoc);
+	open(fd_heredoc, O_RDONLY);
+	dup2(fd_heredoc, STDIN_FILENO);
+	//envoyer dans la boucle qui execute les commandes
+	return -1;
+}
 //doit on verifier que le dernier argument est un nom de fichier et non une commande ?
 int main(int argc, char **argv, char **env)
 {
@@ -116,6 +142,19 @@ int main(int argc, char **argv, char **env)
 	{
 		write(1, "incorrect argument count", 24);
 		return 1;
+	}
+	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
+	{
+		if (argc < 6)
+		{
+			write(1, "incorrect argument count", 24);
+			return 1;
+		}
+		else if (ft_here_doc(argc, argv, env) == -1)
+		{
+			write(1, "here_doc don't success", 22);
+			return 1;
+		}
 	}
 	if (pipex_bonus(argc, argv, env) == -1)
 		return 1;
