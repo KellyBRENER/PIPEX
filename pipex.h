@@ -13,7 +13,9 @@
 #ifndef PIPEX_H
 
 # define PIPEX_H
-#include "./libft/libft.h"
+#include "library42/libft/libft.h"
+#include "library42/printf/ft_printf.h"
+#include "library42/gnl/get_next_line.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -33,6 +35,6 @@ int				ft_exec(char *argv, char **env);
 int				ft_fork_and_dup(char *cmd, char **env);
 int				pipex_bonus(int arg_nbr, char **argv, char **env, int i);
 int				ft_outfile(int arg_nbr, char **argv, char **env);
-int				ft_here_doc(int argc, char **argv, char **env);
+int				ft_here_doc(char **argv);
 
 #endif

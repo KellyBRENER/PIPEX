@@ -22,7 +22,7 @@
 	return ;
 }
 */
-t_list	*ft_lstnew(char *buf)
+t_list	*ft_lstnew_gnl(char *buf)
 {
 	t_list		*lst;
 	int			i;
@@ -49,7 +49,7 @@ t_list	*ft_lstnew(char *buf)
 	return (lst);
 }
 
-int	ft_lstadd_back(t_list **stash, t_list *new)
+int	ft_lstadd_back_gnl(t_list **stash, t_list *new)
 {
 	t_list	*temp;
 

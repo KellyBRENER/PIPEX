@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = libft
+NAME = libft.a
 
 CC = cc
 
@@ -38,30 +38,28 @@ SRC_PRINTF = ft_printf_utils.c ft_printf.c
 
 SRC_NAME = $(SRC_LIBFT) $(SRC_GNL) $(SRC_PRINTF)
 
-OBJ_PATH = objs/
+OBJS_PATH = objs/
 
-OBJ_NAME = $(SRC_NAME:%.c=%.o)
+OBJS_NAME = $(SRC_NAME:%.c=%.o)
 
-OBJS = $(addprefix $(OBJ_PATH),$(OBJ_NAME))
+OBJS = $(addprefix $(OBJS_PATH),$(OBJS_NAME))
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
-		$(AR) $(ARFLAGS) $(NAME) $(OBJ)
+$(NAME): $(OBJS)
+		$(AR) $(ARFLAGS) $(NAME) $(OBJS)
 		ranlib $(NAME)
 
-%.o: %.c
-	$(CC) -o $@ -c $< $(CFLAGS)
+$(OBJS_PATH)%.o: %.c
+	@mkdir -p $(OBJS_PATH)
+	@ $(CC) $(CFLAGS) -c $^ -o $@
 
 clean:
-		rm -f $(OBJ) $(BONUS_OBJ)
+		rm -f $(OBJS_PATH)
 
 fclean: clean
 		rm -f $(NAME)
 
 re: fclean all
-
-bonus: $(OBJ) $(BONUS_OBJ)
-	ar rcs $(NAME) $(OBJ) $(BONUS_OBJ)
 
 .PHONY: all clean fclean re bonus

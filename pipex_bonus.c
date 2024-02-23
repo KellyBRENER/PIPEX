@@ -71,8 +71,10 @@ int	ft_fork_and_dup(char *cmd, char **env)
 //créer une fonction qui boucle jusqu'à la derniere commande
 int	pipex_bonus(int arg_nbr, char **argv, char **env, int i)
 {
-	arg_nbr = arg_nbr - i;
-	while (i < arg_nbr)
+	int	cmd_nbr;
+
+	cmd_nbr = arg_nbr - i;
+	while (i < cmd_nbr)
 	{
 		if (ft_fork_and_dup(argv[i], env) == -1)
 		{
@@ -109,7 +111,7 @@ int	ft_outfile(int arg_nbr, char **argv, char **env)
 /*ft_here_doc cree un fichier here_doc, recupere ce qui est dans l'entree std
 et l'ajoute dans here_doc qui sera utilise pour la 1ere commande*/
 
-int	ft_here_doc(int argc, char **argv, char **env)
+int	ft_here_doc(char **argv)
 {
 	char *line;
 	int	fd_heredoc;
@@ -126,7 +128,7 @@ int	ft_here_doc(int argc, char **argv, char **env)
 			perror("error reading here_doc");
 			return -1;
 		}
-		if (ft_strlen(line) == ft_strlen(argv[2]) && ft_strncmp(line, argv[2], ft_strlen(argv[2]) == 0) == 0)
+		if (ft_strlen(line) == (ft_strlen(argv[2]) + 1) && ft_strncmp(line, argv[2], ft_strlen(argv[2])) == 0)
 		{
 			free(line);
 			break;
@@ -155,7 +157,7 @@ int main(int argc, char **argv, char **env)
 			write(1, "incorrect argument count", 24);
 			return 1;
 		}
-		else if (ft_here_doc(argc, argv, env) == -1)
+		else if (ft_here_doc(argv) == -1)
 		{
 			perror("here_doc don't success");
 			return 1;
@@ -164,7 +166,8 @@ int main(int argc, char **argv, char **env)
 	}
 	int fd_infile;
 
-	if (fd_infile = open(argv[1], O_RDONLY) == -1)
+	fd_infile = open(argv[1], O_RDONLY);
+	if (fd_infile == -1)
 	{
 		perror("error reading infile or no infile to read");
 		return 1;

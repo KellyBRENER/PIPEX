@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
+#include "get_next_line.h"
 
 char	*make_line(t_list *stash)
 {
@@ -69,7 +69,7 @@ void	new_content(t_list **stash)
 	}
 }
 
-int	ft_lstclear(t_list **stash, char *buf)
+int	ft_lstclear_gnl(t_list **stash, char *buf)
 {
 	t_list	*temp;
 
@@ -104,7 +104,7 @@ int	make_stash(int fd, char *buf, t_list **stash)
 	buf[lu] = '\0';
 	while (lu)
 	{
-		ft_lstadd_back(stash, ft_lstnew(buf));
+		ft_lstadd_back_gnl(stash, ft_lstnew_gnl(buf));
 		if (!*stash)
 		{
 			free(buf);
@@ -132,12 +132,12 @@ char	*get_next_line(int fd)
 	buf = malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (!buf || fd < 0 || read(fd, buf, 0) < 0 || BUFFER_SIZE <= 0)
 	{
-		ft_lstclear(&stash[fd], buf);
+		ft_lstclear_gnl(&stash[fd], buf);
 		return (NULL);
 	}
 	if (make_stash(fd, buf, &stash[fd]))
 		line = make_line(stash[fd]);
-	ft_lstclear(&stash[fd], buf);
+	ft_lstclear_gnl(&stash[fd], buf);
 	return (line);
 }
 /*

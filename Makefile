@@ -18,7 +18,7 @@ CFLAGS = -Wall -Wextra -Werror -g
 
 RM = rm -rf
 
-LIBFT = ./libft/libft.a
+LIBFT = ./library42/libft.a
 
 SRC = pipex.c
 
@@ -31,7 +31,7 @@ BONUS_OBJ = $(BONUS:.c=.o)
 all: $(NAME)
 
 $(LIBFT):
-		@make -C ./libft
+		@make -C ./library42
 
 $(NAME): $(OBJ) $(LIBFT)
 		$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT)
