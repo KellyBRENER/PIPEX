@@ -6,16 +6,12 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/13 12:24:29 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/22 17:04:41 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-int	ft_heredoc(char **argv)
-{
-	dup2(STDOUT_FILENO, STDIN_FILENO);
-	
-}
+
 void ft_tabfree(char **tab)
 {
 	int i;
