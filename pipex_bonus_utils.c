@@ -6,29 +6,11 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/23 15:27:40 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/26 15:13:11 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-//ft_exec execute la commande
-int	ft_exec(char *argv, char **env)
-{
-	char	**ve_cmd;
-	char	*cmd_path;
-	char	*cmd;
-
-	ve_cmd = ft_split(argv, ' ');
-	cmd = ft_strjoin("/", ve_cmd[0]);
-	cmd_path = ft_getpath(cmd, env);
-	execve(cmd_path, ve_cmd, env);
-	free(cmd_path);
-	free(cmd);
-	ft_tabfree(ve_cmd);
-	perror("error command cannot be found or no executable");
-	return (-1);
-}
 
 /*cree la fork et la pipe, attribue la sortie de la commande, execute a commande
 puis attribue l'entree de la prochaine commande*/
