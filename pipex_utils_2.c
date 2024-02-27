@@ -6,7 +6,7 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/26 15:13:11 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/27 14:19:58 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int	ft_fork_and_dup(char *cmd, char **env)
 }
 
 //créer une fonction qui boucle jusqu'à la derniere commande
-int	pipex_bonus(int arg_nbr, char **argv, char **env, int i)
+int	pipex(int arg_nbr, char **argv, char **env, int i)
 {
 	while (i < arg_nbr - 2)
 	{

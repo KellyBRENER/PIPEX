@@ -3,12 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kbrener- <kbrener-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 13:51:50 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/26 13:51:59 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/27 14:24:52 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+# include "pipex.h"
 
 int	main(int argc, char **argv, char **env)
 {
@@ -31,7 +33,7 @@ int	main(int argc, char **argv, char **env)
 		return (perror("error reading infile or no infile to read"), 1);
 	dup2(fd_infile, STDIN_FILENO);
 	close(fd_infile);
-	if (pipex_bonus(argc, argv, env, i) == -1)
+	if (pipex(argc, argv, env, i) == -1)
 		return (1);
 	return (0);
 }

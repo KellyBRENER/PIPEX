@@ -6,50 +6,67 @@
 #    By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/06 15:53:15 by kbrener-          #+#    #+#              #
-#    Updated: 2024/02/13 14:43:23 by kbrener-         ###   ########.fr        #
+#    Updated: 2024/02/27 14:24:22 by kbrener-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = pipex
+# Program name
+NAME	= pipex
+BONUS = pipex_bonus
 
-CC = cc
+# Compiler options
+CC		= cc
+CFLAGS	= -Wall -Wextra -Werror -g #-fsanitize=address
 
-CFLAGS = -Wall -Wextra -Werror -g
+# Libft
+LIBFT_PATH = ./library42/
+LIBFT_LIB = $(LIBFT_PATH)library42.a
 
-RM = rm -rf
+# program files
+SRC		= 	pipex.c \
+			pipex_utils_1.c \
+			pipex_utils_2.c \
 
-LIBFT = ./library42/libft.a
 
-SRC = pipex.c
+SRC_BONUS	=pipex_bonus.c \
+			pipex_utils_1.c \
+			pipex_utils_2.c \
 
-BONUS = pipex_bonus.c
+OBJ		= $(SRC:.c=.o)
 
-OBJ = $(SRC:.c=.o)
+OBJ_BONUS = $(SRC_BONUS:.c=.o)
 
-BONUS_OBJ = $(BONUS:.c=.o)
+# Includes
+INCLUDES = 	-I ./includes/\
+			-I ./library42/\
 
-all: $(NAME)
+all : $(BONUS) $(LIBFT_LIB) $(NAME)
 
-$(LIBFT):
-		@make -C ./library42
-
-$(NAME): $(OBJ) $(LIBFT)
-		$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT)
-
+# Compiling Libft
 %.o: %.c
-		$(CC) $(CFLAGS) -c $< -o $@
+		$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDES)
+
+$(LIBFT_LIB):
+	@make -sC $(LIBFT_PATH)
+
+# Compiling PIPEX
+$(NAME): $(OBJ) $(LIBFT_LIB)
+	@$(CC) $(CFLAGS) $(OBJ) $(LIBFT_LIB) -o $(NAME) -g
+
+# Compiling BONUS
+$(BONUS): $(OBJ_BONUS) $(LIBFT_LIB)
+	@$(CC) $(CFLAGS) $(OBJ_BONUS) $(LIBFT_LIB) -o $(BONUS) -g
 
 clean:
-		@$(RM) -r $(OBJ) $(BONUS_OBJ)
-		@make clean -C ./libft
+	@make clean -sC $(LIBFT_PATH)
+	@rm -rf $(OBJ)
+	@rm -rf $(OBJ_BONUS)
+
 
 fclean: clean
-		@$(RM) $(NAME)
-		@$(RM) $(LIBFT)
+#	@make fclean -sC
+	@rm -rf $(BONUS) $(LIBFT_LIB) $(NAME)
 
 re: fclean all
-
-bonus: $(OBJ) $(BONUS_OBJ) $(LIBFT)
-		$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(BONUS_OBJ) $(LIBFT)
 
 .PHONY: all clean fclean re bonus

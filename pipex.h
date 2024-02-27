@@ -6,7 +6,7 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 16:07:06 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/26 15:34:15 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/27 14:22:09 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,11 @@
 char			*ft_getpath(char *cmd, char **env);
 void			ft_tabfree(char **tab);
 char			*ft_getenv(char *str, char **env);
-int				pipex(char **argv, char **env);
 int				ft_exec(char *argv, char **env);
 int				ft_fork_and_dup(char *cmd, char **env);
-int				pipex_bonus(int arg_nbr, char **argv, char **env, int i);
+int				pipex(int arg_nbr, char **argv, char **env, int i);
 int				ft_outfile(int arg_nbr, char **argv, char **env);
 int				ft_here_doc(char **argv);
+char			**get_allpath(char **env);
 
 #endif
