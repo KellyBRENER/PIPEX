@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_bonus_utils.c                                :+:      :+:    :+:   */
+/*   pipex_utils_2.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/27 14:19:58 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/28 17:14:42 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int	ft_fork_and_dup(char *cmd, char **env)
 		close(fd[0]);
 		close(fd[1]);
 		if (ft_exec(cmd, env) == -1)
-			return (perror("execution of the command failed"), -1);
+			return (-1);
 	}
 	close(fd[1]);
 	dup2(fd[0], STDIN_FILENO);
@@ -45,11 +45,12 @@ int	pipex(int arg_nbr, char **argv, char **env, int i)
 	while (i < arg_nbr - 2)
 	{
 		if (ft_fork_and_dup(argv[i], env) == -1)
-			return (perror("the command cannot be executed"), -1);
+			return (-1);
 		i++;
 	}
+	unlink("here_doc");
 	if (ft_outfile(arg_nbr, argv, env) == -1)
-		return (perror("error executing last command"), -1);
+		return (-1);
 	return (-1);
 }
 

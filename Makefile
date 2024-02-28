@@ -6,7 +6,7 @@
 #    By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/06 15:53:15 by kbrener-          #+#    #+#              #
-#    Updated: 2024/02/27 14:24:22 by kbrener-         ###   ########.fr        #
+#    Updated: 2024/02/28 16:09:03 by kbrener-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -64,7 +64,7 @@ clean:
 
 
 fclean: clean
-#	@make fclean -sC
+	@make fclean -sC $(LIBFT_PATH)
 	@rm -rf $(BONUS) $(LIBFT_LIB) $(NAME)
 
 re: fclean all

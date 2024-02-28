@@ -6,7 +6,7 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 13:51:50 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/27 14:31:32 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/28 17:15:54 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	main(int argc, char **argv, char **env)
 		if (argc < 6)
 			return (write(1, "incorrect argument count", 24), 1);
 		else if (ft_here_doc(argv) == -1)
-			return (perror("here_doc don't success"), 1);
+			return (1);
 		i = 3;
 	}
 	fd_infile = open(argv[1], O_RDONLY);

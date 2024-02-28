@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_utils.c                                      :+:      :+:    :+:   */
+/*   pipex_utils_1.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/26 15:31:35 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/28 17:12:33 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,15 @@ int	ft_exec(char *argv, char **env)
 	ve_cmd = ft_split(argv, ' ');
 	cmd = ft_strjoin("/", ve_cmd[0]);
 	cmd_path = ft_getpath(cmd, env);
+	if (cmd_path == NULL)
+	{
+		free(cmd_path);
+		free(cmd);
+		ft_tabfree(ve_cmd);
+		return (-1);
+	}
 	execve(cmd_path, ve_cmd, env);
+	perror("command execution failed");
 	free(cmd_path);
 	free(cmd);
 	ft_tabfree(ve_cmd);
