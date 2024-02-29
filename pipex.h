@@ -6,7 +6,7 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 16:07:06 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/29 11:55:06 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/29 13:39:32 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,5 @@ int				ft_outfile(int arg_nbr, char **argv, char **env);
 int				ft_here_doc(char **argv);
 char			**get_allpath(char **env);
 int				parsing(int argc, char **argv);
-
 
 #endif

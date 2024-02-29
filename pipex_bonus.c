@@ -6,7 +6,7 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 13:51:50 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/29 11:54:15 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/29 13:36:14 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,12 @@ int	ft_outfile(int arg_nbr, char **argv, char **env)
 {
 	int	fd_out;
 
-	fd_out = open(argv[arg_nbr - 1], O_RDWR | O_CREAT | O_TRUNC, 0777);
+	if (access(argv[arg_nbr - 1], F_OK) == 0)
+	{
+		if (access(argv[arg_nbr - 1], W_OK) == -1)
+			return (perror("no access to write in outfile"), -1);
+	}
+	fd_out = open(argv[arg_nbr - 1], O_WRONLY | O_APPEND | O_CREAT, 0777);
 	if (fd_out == -1)
 		return (perror("error opening outfile"), -1);
 	dup2(fd_out, STDOUT_FILENO);
