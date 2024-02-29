@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_utils_1.c                                    :+:      :+:    :+:   */
+/*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/08 14:41:58 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/28 17:12:33 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/02/29 11:45:20 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,4 +103,28 @@ int	ft_exec(char *argv, char **env)
 	free(cmd);
 	ft_tabfree(ve_cmd);
 	return (-1);
+}
+
+int	ft_fork_and_dup(char *cmd, char **env)
+{
+	int	pid;
+	int	fd[2];
+
+	if (pipe(fd) == -1)
+		return (perror("error creating pipe"), -1);
+	pid = fork();
+	if (pid == -1)
+		return (perror("error creating fork"), -1);
+	if (pid == 0)
+	{
+		dup2(fd[1], STDOUT_FILENO);
+		close(fd[0]);
+		close(fd[1]);
+		if (ft_exec(cmd, env) == -1)
+			return (-1);
+	}
+	close(fd[1]);
+	dup2(fd[0], STDIN_FILENO);
+	close(fd[0]);
+	return (0);
 }

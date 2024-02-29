@@ -6,7 +6,7 @@
 #    By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/06 15:53:15 by kbrener-          #+#    #+#              #
-#    Updated: 2024/02/28 16:09:03 by kbrener-         ###   ########.fr        #
+#    Updated: 2024/02/29 11:25:08 by kbrener-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,13 +24,11 @@ LIBFT_LIB = $(LIBFT_PATH)library42.a
 
 # program files
 SRC		= 	pipex.c \
-			pipex_utils_1.c \
-			pipex_utils_2.c \
+			pipex_utils.c \
 
 
-SRC_BONUS	=pipex_bonus.c \
-			pipex_utils_1.c \
-			pipex_utils_2.c \
+SRC_BONUS	= pipex_bonus.c \
+			pipex_utils.c \
 
 OBJ		= $(SRC:.c=.o)
 
