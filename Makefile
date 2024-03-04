@@ -6,21 +6,21 @@
 #    By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/06 15:53:15 by kbrener-          #+#    #+#              #
-#    Updated: 2024/02/29 11:25:08 by kbrener-         ###   ########.fr        #
+#    Updated: 2024/03/04 14:13:10 by kbrener-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # Program name
 NAME	= pipex
-BONUS = pipex_bonus
+BONUS	= pipex
 
 # Compiler options
 CC		= cc
 CFLAGS	= -Wall -Wextra -Werror -g #-fsanitize=address
 
 # Libft
-LIBFT_PATH = ./library42/
-LIBFT_LIB = $(LIBFT_PATH)library42.a
+LIBFT_PATH = ./libft/
+LIBFT_LIB = $(LIBFT_PATH)libft.a
 
 # program files
 SRC		= 	pipex.c \
@@ -36,9 +36,9 @@ OBJ_BONUS = $(SRC_BONUS:.c=.o)
 
 # Includes
 INCLUDES = 	-I ./includes/\
-			-I ./library42/\
+			-I ./libft/\
 
-all : $(BONUS) $(LIBFT_LIB) $(NAME)
+all : $(LIBFT_LIB) $(NAME)
 
 # Compiling Libft
 %.o: %.c
@@ -52,16 +52,18 @@ $(NAME): $(OBJ) $(LIBFT_LIB)
 	@$(CC) $(CFLAGS) $(OBJ) $(LIBFT_LIB) -o $(NAME) -g
 
 # Compiling BONUS
-$(BONUS): $(OBJ_BONUS) $(LIBFT_LIB)
+bonus: $(OBJ_BONUS) $(LIBFT_LIB)
 	@$(CC) $(CFLAGS) $(OBJ_BONUS) $(LIBFT_LIB) -o $(BONUS) -g
 
 clean:
+	@echo "les fichiers ont ete supprimes"
 	@make clean -sC $(LIBFT_PATH)
 	@rm -rf $(OBJ)
 	@rm -rf $(OBJ_BONUS)
 
 
 fclean: clean
+	@echo "les fichers ont ete supprimes"
 	@make fclean -sC $(LIBFT_PATH)
 	@rm -rf $(BONUS) $(LIBFT_LIB) $(NAME)
 

@@ -6,16 +6,16 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 16:07:06 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/03/04 09:57:09 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/03/04 14:04:52 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PIPEX_H
 
 # define PIPEX_H
-# include "library42/libft/libft.h"
-# include "library42/printf/ft_printf.h"
-# include "library42/gnl/get_next_line.h"
+# include "libft/libft/libft.h"
+# include "libft/printf/ft_printf.h"
+# include "libft/gnl/get_next_line.h"
 # include <stdio.h>
 # include <string.h>
 # include <stdlib.h>

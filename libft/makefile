@@ -6,11 +6,11 @@
 #    By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/27 12:50:58 by kbrener-          #+#    #+#              #
-#    Updated: 2024/02/27 13:03:15 by kbrener-         ###   ########.fr        #
+#    Updated: 2024/03/04 14:02:52 by kbrener-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = library42.a
+NAME = libft.a
 
 SRCS = \
 	libft/ft_isascii.c \
