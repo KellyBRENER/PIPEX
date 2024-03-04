@@ -6,14 +6,14 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 13:51:50 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/02/29 13:36:14 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/03/04 09:30:23 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
 /*ft_outfile effectue la derniere commande et l'envoie dans le outfile*/
-int	ft_outfile(int arg_nbr, char **argv, char **env)
+int	ft_outfile(int arg_nbr, char **argv, char **env, int hd)
 {
 	int	fd_out;
 
@@ -22,7 +22,10 @@ int	ft_outfile(int arg_nbr, char **argv, char **env)
 		if (access(argv[arg_nbr - 1], W_OK) == -1)
 			return (perror("no access to write in outfile"), -1);
 	}
-	fd_out = open(argv[arg_nbr - 1], O_WRONLY | O_APPEND | O_CREAT, 0777);
+	if (hd == 1)
+		fd_out = open(argv[arg_nbr - 1], O_WRONLY | O_APPEND | O_CREAT, 0777);
+	else
+		fd_out = open(argv[arg_nbr - 1], O_WRONLY | O_TRUNC | O_CREAT, 0777);
 	if (fd_out == -1)
 		return (perror("error opening outfile"), -1);
 	dup2(fd_out, STDOUT_FILENO);
@@ -62,7 +65,7 @@ int	ft_here_doc(char **argv)
 }
 
 //créer une fonction qui boucle jusqu'à la derniere commande
-int	pipex(int arg_nbr, char **argv, char **env, int i)
+int	pipex(int arg_nbr, char **argv, char **env, int i, int hd)
 {
 	while (i < arg_nbr - 2)
 	{
@@ -71,7 +74,7 @@ int	pipex(int arg_nbr, char **argv, char **env, int i)
 		i++;
 	}
 	unlink("here_doc");
-	if (ft_outfile(arg_nbr, argv, env) == -1)
+	if (ft_outfile(arg_nbr, argv, env, hd) == -1)
 		return (-1);
 	return (-1);
 }
@@ -80,12 +83,15 @@ int	main(int argc, char **argv, char **env)
 {
 	int	i;
 	int	fd_infile;
+	int	hd;
 
+	hd = 0;
 	i = 2;
 	if (argc < 5)
 		return (write(1, "incorrect argument count", 24), 1);
 	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
 	{
+		hd = 1;
 		if (argc < 6)
 			return (write(1, "incorrect argument count", 24), 1);
 		else if (ft_here_doc(argv) == -1)
@@ -97,7 +103,7 @@ int	main(int argc, char **argv, char **env)
 		return (perror("error reading infile or no infile to read"), 1);
 	dup2(fd_infile, STDIN_FILENO);
 	close(fd_infile);
-	if (pipex(argc, argv, env, i) == -1)
+	if (pipex(argc, argv, env, i, hd) == -1)
 		return (1);
 	return (0);
 }
