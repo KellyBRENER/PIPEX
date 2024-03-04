@@ -6,7 +6,7 @@
 /*   By: kbrener- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 13:51:50 by kbrener-          #+#    #+#             */
-/*   Updated: 2024/03/04 09:30:23 by kbrener-         ###   ########.fr       */
+/*   Updated: 2024/03/04 09:57:54 by kbrener-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,13 @@ int	ft_here_doc(char **argv)
 }
 
 //créer une fonction qui boucle jusqu'à la derniere commande
-int	pipex(int arg_nbr, char **argv, char **env, int i, int hd)
+int	pipex(char **argv, char **env, int i, int hd)
 {
+	int	arg_nbr;
+
+	arg_nbr = 0;
+	while (argv[arg_nbr])
+		arg_nbr++;
 	while (i < arg_nbr - 2)
 	{
 		if (ft_fork_and_dup(argv[i], env) == -1)
@@ -103,7 +108,7 @@ int	main(int argc, char **argv, char **env)
 		return (perror("error reading infile or no infile to read"), 1);
 	dup2(fd_infile, STDIN_FILENO);
 	close(fd_infile);
-	if (pipex(argc, argv, env, i, hd) == -1)
+	if (pipex(argv, env, i, hd) == -1)
 		return (1);
 	return (0);
 }
